@@ -2,11 +2,11 @@ import styles from './styles/chat_styles.module.css';
 import {useEffect, useMemo, useState} from 'react';
 import {Button, Dropdown, Space} from 'antd';
 import {MessageOutlined} from '@ant-design/icons';
-import {ChatModal} from './ChatModal.jsx';
+import {ChatModal} from './components/ChatModal.tsx';
 import {useChatSocket} from "./context/ChatSocketContext";
 import type {UserData} from "./types/types.ts";
 
-const ChatBtn = ({ userdata }: { userdata: UserData }) => {
+const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const {
         connected,           // boolean - подключен ли WebSocket
@@ -22,14 +22,13 @@ const ChatBtn = ({ userdata }: { userdata: UserData }) => {
         }
     }, [connected]);
     useEffect(() => {
-        fetchChatsList();
-    }, [fetchChatsList]);
-    useEffect(() => {
-        fetchChatsList();
+        fetchChatsList(null);
     }, [fetchChatsList, totalUnread]);
 
     useEffect(() => {
-        setCurrentUserId(userdata.user.id);
+        if (userdata && userdata?.user) {
+            setCurrentUserId(userdata.user.id);
+        }
     }, [userdata]);
 
     // Используем кастомный хук для логики ролей
@@ -113,7 +112,7 @@ const ChatBtn = ({ userdata }: { userdata: UserData }) => {
             <ChatModal open={isModalOpen}
                        onOk={handleOk}
                        onCancel={handleCancel}
-                       smsData={smsData}
+                       positionCorner={null}
             />
         </Space>
     );

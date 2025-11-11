@@ -1,19 +1,28 @@
 import { useRef, useEffect, useState } from 'react';
 import { Modal } from 'antd';
-import Draggable from 'react-draggable';
+import Draggable, {type DraggableData, type DraggableEvent} from 'react-draggable';
 import { CloseOutlined } from '@ant-design/icons';
-import ChatLayout from './ChatLayout';
-import styles from './styles/chat_styles.module.css';
+import ChatLayout from './ChatLayout.tsx';
+import styles from '../styles/chat_styles.module.css';
 
-export const ChatModal = ({ open, onOk, onCancel, smsData, positionCorner }) => {
-    const dragRef = useRef(null);
-    const boundsRef = useRef(null);
-    const [dragging, setDragging] = useState(false);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
+interface ChatModalParams {
+    open: boolean;
+    onOk: () => void;
+    onCancel: () => void;
+    positionCorner: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | null;
+}
+
+export const ChatModal = ({ open, onOk, onCancel, positionCorner }: ChatModalParams) => {
+    const dragRef = useRef<HTMLDivElement | null>(null);
+    const boundsRef = useRef<{top: number, right: number, bottom: number, left: number} | null>(null);
+    const [dragging, setDragging] = useState<boolean>(false);
+    const [position, setPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
     // draggable выключать, если positionCorner задан
     const draggable = !positionCorner;
 
-    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+    const clamp = (value: number, min: number, max: number): number => {
+        return Math.min(Math.max(value, min), max);
+    };
 
     useEffect(() => {
         if (open) {
@@ -76,8 +85,9 @@ export const ChatModal = ({ open, onOk, onCancel, smsData, positionCorner }) => 
         }
     };
 
-    const onStop = (e, data) => {
+    const onStop = (e: DraggableEvent, data: DraggableData) => {
         setDragging(false);
+        console.log(e);
 
         if (boundsRef.current) {
             setPosition({
@@ -113,7 +123,7 @@ export const ChatModal = ({ open, onOk, onCancel, smsData, positionCorner }) => 
                 draggable ? (
                     <Draggable
                         handle=".ant-modal-title"
-                        bounds={boundsRef.current}
+                        bounds={boundsRef.current || undefined}
                         onStart={onStart}
                         onStop={onStop}
                         nodeRef={dragRef}

@@ -67,8 +67,8 @@ export interface AlertInfo {
 }
 
 export interface ChatToList {
-    id: number,
-    chat_id: number,
+    id: number | undefined,
+    chat_id: number | undefined,
     text: string,
     files: string[],
     status: boolean,
@@ -77,16 +77,19 @@ export interface ChatToList {
     count_unread: number,
     from: From,
     to: To,
+    to_id?: number,
+    from_id?: number,
+    last_message?: number,
 }
 
 export interface From {
-    id: number,
+    id: number | undefined,
     name: string,
     surname: string,
 }
 
 export interface To {
-    id: number,
+    id: number | undefined,
     name: string,
     surname: string,
 }
@@ -117,4 +120,25 @@ export interface File {
     route: string,
     extension: string,
     name: string,
+}
+
+export interface Normalized {
+    fromId: number,
+    id: number,
+    text: string,
+    files: File[],
+    timestamp: number,
+    isSelf: boolean,
+    senderName: string,
+    isLocal: boolean,
+    isSending: boolean,
+    status: boolean,
+    _raw: ChatMessage,
+}
+
+export interface messagesWithDividersInterface {
+    type: string;
+    id: string;
+    timestamp?: number;
+    message?: Normalized;
 }

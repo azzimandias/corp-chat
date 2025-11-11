@@ -21,13 +21,15 @@ interface ChatSocketContextType {
     loadingChat: boolean;
     loadingSendSms: boolean;
 
-    fetchChatsList: (search: string) => void;
+    fetchChatsList: (search: string | null) => void;
     fetchChatMessages: (chatId: number, lastMsg: number | null) => void;
     sendSms: ({ to, text, files, answer, timestamp, from_id }: toSendSms) => void;
-    markMessagesAsRead: (messageIds: number[]) => void;
+    markMessagesAsRead: (messageIds: (number | undefined)[]) => void;
 
     userdata: UserData | null;
     setUserData: (data: UserData) => void;
+    HTTP_HOST: string | null;
+    SET_HTTP_HOST: (token: string) => void;
     CSRF_TOKEN: string | null;
     SET_CSRF_TOKEN: (token: string) => void;
     PRODMODE: boolean | null;
@@ -40,7 +42,7 @@ interface toSendSms {
     to: number,
     text: string,
     files?: UploadFile[],
-    answer: number,
+    answer: number | null,
     timestamp: number,
     from_id: number,
 }
@@ -55,6 +57,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
     const [userdata, setUserData ] = useState<UserData | null>(null);
     const userdataRef = useRef<UserData | null>(userdata);
 
+    const [HTTP_HOST, SET_HTTP_HOST] = useState<string>('');
     const [CSRF_TOKEN, SET_CSRF_TOKEN] = useState<string>('');
     const [PRODMODE, SET_PRODMODE] = useState<boolean>(false);
     const [PROD_AXIOS_INSTANCE, SET_PROD_AXIOS_INSTANCE] = useState<AxiosInstance | null>(null);
@@ -97,7 +100,6 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 return;
             }
             socket.emit('subscribeToChat', userId);
-            socket.emit('subscribeToNotification', userId);
         });
         // --- получаем новое сообщение ---
         socket.on('new:sms', (data) => {
@@ -150,7 +152,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
         chatsListRef.current = chatsList;
     }, [chatsList]);
 
-    const fetchChatsList = useCallback(async (search: string) => {
+    const fetchChatsList = useCallback(async (search: string | null = null) => {
         setLoadingChatList(true);
         if (PRODMODE) {
             try {
@@ -261,7 +263,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
             setLoadingSendSms(false);
         }
     }, [loadingSendSms]);
-    const markMessagesAsRead = useCallback(async (messageIds: number[]) => {
+    const markMessagesAsRead = useCallback(async (messageIds: (number | undefined)[]) => {
         for (const id of messageIds) {
             if (PRODMODE) {
                 try {
@@ -469,11 +471,13 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 markMessagesAsRead,
 
                 userdata,
+                HTTP_HOST,
                 CSRF_TOKEN,
                 PRODMODE,
                 PROD_AXIOS_INSTANCE,
 
                 setUserData,
+                SET_HTTP_HOST,
                 SET_CSRF_TOKEN,
                 SET_PRODMODE,
                 SET_PROD_AXIOS_INSTANCE,
