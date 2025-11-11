@@ -1,60 +1,83 @@
 import {createContext, useCallback, useContext, useEffect, useRef, useState} from 'react';
-import {io} from 'socket.io-client';
+import {io, Socket} from 'socket.io-client';
 import {CHAT_LIST_MOCK, CHAT_MOCK, CHAT_MOCK_NEW} from '../mock/mockSms.js';
 import dayjs from "dayjs";
+import * as React from "react";
+import type {AxiosInstance} from "axios";
+import type {AlertInfo, Chat, ChatMessage, ChatToList, File, UserData} from "../types/types.ts";
+import type {UploadFile} from "antd";
 
+interface ChatSocketContextType {
+    connected: boolean;
+    connectionStatus: string;
+    refreshKey: number;
+    isAlertVisibleKey: number;
+    alertInfo: AlertInfo;
+    totalUnread: number;
+    chatsList: ChatToList[];
+    chats: Chat[];
+    currentChatId: number;
+    loadingChatList: boolean;
+    loadingChat: boolean;
+    loadingSendSms: boolean;
 
-export const ChatSocketContext = createContext(null);
+    fetchChatsList: (search: string) => void;
+    fetchChatMessages: (chatId: number, lastMsg: number | null) => void;
+    sendSms: ({ to, text, files, answer, timestamp, from_id }: toSendSms) => void;
+    markMessagesAsRead: (messageIds: number[]) => void;
 
-export const ChatSocketProvider = ({ children, url }) => {
-    const socketRef = useRef(null);
-    const [connected, setConnected] = useState(false);
-    const [connectionStatus, setConnectionStatus] = useState('disconnected');
+    userdata: UserData | null;
+    setUserData: (data: UserData) => void;
+    CSRF_TOKEN: string | null;
+    SET_CSRF_TOKEN: (token: string) => void;
+    PRODMODE: boolean | null;
+    SET_PRODMODE: (mode: boolean) => void;
+    PROD_AXIOS_INSTANCE: AxiosInstance | null;
+    SET_PROD_AXIOS_INSTANCE: (instance: AxiosInstance) => void;
+}
 
+interface toSendSms {
+    to: number,
+    text: string,
+    files?: UploadFile[],
+    answer: number,
+    timestamp: number,
+    from_id: number,
+}
 
-    const [CSRF_TOKEN, SET_CSRF_TOKEN] = useState('');
-    const [PRODMODE, SET_PRODMODE] = useState(false);
-    const [PROD_AXIOS_INSTANCE, SET_PROD_AXIOS_INSTANCE] = useState(null);
-    const [HTTP_HOST, SET_HTTP_HOST] = useState(null);
-    const [BFF_PORT, SET_BFF_PORT] = useState(null);
-    const [userdata, setUserData ] = useState(null);
-    const userdataRef = useRef(userdata);
+export const ChatSocketContext = createContext<ChatSocketContextType | undefined>(undefined);
 
-    const [chatsList, setChatsList] = useState([]); // боковой список чатов (последнее сообщение)
+export const ChatSocketProvider = ({ children, url }: { children: React.ReactNode, url: string, }) => {
+    const socketRef = useRef<Socket | null>(null);
+    const [connected, setConnected] = useState<boolean>(false);
+    const [connectionStatus, setConnectionStatus] = useState<string>('disconnected');
+
+    const [userdata, setUserData ] = useState<UserData | null>(null);
+    const userdataRef = useRef<UserData | null>(userdata);
+
+    const [CSRF_TOKEN, SET_CSRF_TOKEN] = useState<string>('');
+    const [PRODMODE, SET_PRODMODE] = useState<boolean>(false);
+    const [PROD_AXIOS_INSTANCE, SET_PROD_AXIOS_INSTANCE] = useState<AxiosInstance | null>(null);
+
+    const [chatsList, setChatsList] = useState<ChatToList[]>([]); // боковой список чатов (последнее сообщение)
     const chatsListRef = useRef(chatsList);
-    const [chats, setChats] = useState([]); // все чаты
+    const [chats, setChats] = useState<Chat[]>([]); // все чаты
     const chatsRef = useRef(chats);
-    const [currentChatId, setCurrentChatId] = useState(0); // открытый чат
+    const [currentChatId, setCurrentChatId] = useState<number>(0); // открытый чат
 
-    const [totalUnread, setTotalUnread] = useState(0); // количество всех непрочитанных сообщений
+    const [totalUnread, setTotalUnread] = useState<number>(0); // количество всех непрочитанных сообщений
 
-    const [loadingChatList, setLoadingChatList] = useState(false); // ожидаем ответа со списком чатов
-    const [loadingChat, setLoadingChat] = useState(false); // ожидаем ответа с чатом
-    const [loadingSendSms, setLoadingSendSms] = useState(false); // ожидаем ответа при отправке сообщения
+    const [loadingChatList, setLoadingChatList] = useState<boolean>(false); // ожидаем ответа со списком чатов
+    const [loadingChat, setLoadingChat] = useState<boolean>(false); // ожидаем ответа с чатом
+    const [loadingSendSms, setLoadingSendSms] = useState<boolean>(false); // ожидаем ответа при отправке сообщения
 
-    const [refreshKey, setRefreshKey] = useState(0);
-    const [isAlertVisibleKey, setIsAlertVisibleKey] = useState(0);
-    const [alertInfo, setAlertInfo] = useState({
+    const [refreshKey, setRefreshKey] = useState<number>(0);
+    const [isAlertVisibleKey, setIsAlertVisibleKey] = useState<number>(0);
+    const [alertInfo, setAlertInfo] = useState<AlertInfo>({
         message: '',
         description: '',
-        type: 'info', //"success" | "info" | "warning" | "error"
+        type: 'info',
     });
-
-    const listeners = useRef({});
-
-    // --- WS события ---
-    const on = useCallback((event, handler) => {
-        if (!listeners.current[event]) listeners.current[event] = new Set();
-        listeners.current[event].add(handler);
-    }, []);
-
-    const off = useCallback((event, handler) => {
-        listeners.current[event]?.delete(handler);
-    }, []);
-
-    const emitToListeners = useCallback((event, payload) => {
-        listeners.current[event]?.forEach((h) => h(payload));
-    }, []);
 
     const connect = useCallback(() => {
         if (!PRODMODE) return;
@@ -83,9 +106,6 @@ export const ChatSocketProvider = ({ children, url }) => {
             if (data.left) addMessageToChatList(data.left, false);
             if (data.left) setTotalUnread(data.left?.total_unread);
             if (data.right) addMessageToChat(data.right);
-
-            if (data.right)  emitToListeners('message:new', data.right);
-            emitToListeners('new:sms', data);
         });
         socket.on('update:sms', (data) => {
             console.log('WS update:sms', data);
@@ -104,15 +124,15 @@ export const ChatSocketProvider = ({ children, url }) => {
         socket.on('read:notification', () => {
             setRefreshKey(dayjs().unix());
         });
-        socket.on('disconnect', (reason) => {
+        socket.on('disconnect', () => {
             console.log('CHAT WEBSOCKET DISCONNECTED');
             setConnected(false);
             setConnectionStatus('disconnected');
         });
-        socket.on('connect_error', (error) => {
+        socket.on('connect_error', () => {
             console.log('CHAT WEBSOCKET CONNECT ERROR');
         });
-    }, [url, emitToListeners]);
+    }, [url]);
 
     useEffect(() => {
         if (userdata) {
@@ -130,10 +150,11 @@ export const ChatSocketProvider = ({ children, url }) => {
         chatsListRef.current = chatsList;
     }, [chatsList]);
 
-    const fetchChatsList = useCallback(async (search) => {
+    const fetchChatsList = useCallback(async (search: string) => {
         setLoadingChatList(true);
         if (PRODMODE) {
             try {
+                if (!PROD_AXIOS_INSTANCE) return;
                 const endpoint = `/api/sms`;
                 const response = await PROD_AXIOS_INSTANCE.post(endpoint, {
                     data: {search},
@@ -154,11 +175,12 @@ export const ChatSocketProvider = ({ children, url }) => {
             setLoadingChatList(false);
         }
     }, [loadingChatList]);
-    const fetchChatMessages = useCallback(async (chatId, lastMsg = null) => {
+    const fetchChatMessages = useCallback(async (chatId: number, lastMsg: number | null = null) => {
         if (loadingChat) return;
         setLoadingChat(true);
         if (PRODMODE) {
             try {
+                if (!PROD_AXIOS_INSTANCE) return;
                 const endpoint = `/api/sms/${chatId}`;
                 const response = await PROD_AXIOS_INSTANCE.post(endpoint, {
                     data: {
@@ -201,10 +223,11 @@ export const ChatSocketProvider = ({ children, url }) => {
             setLoadingChat(false);
         }
     }, [loadingChat]);
-    const sendSms = useCallback(async ({ to, text, files, answer, timestamp, from_id }) => {
-        insertMessagesToArrays(to, text, files, answer, timestamp, from_id);
+    const sendSms = useCallback(async ({ to, text, files, answer, timestamp, from_id }: toSendSms) => {
+        insertMessagesToArrays({to, text, answer, timestamp, from_id});
         setLoadingSendSms(true);
         try {
+            if (!PROD_AXIOS_INSTANCE) return;
             const formData = new FormData();
             formData.append('_token', CSRF_TOKEN);
             formData.append(
@@ -217,13 +240,10 @@ export const ChatSocketProvider = ({ children, url }) => {
                 })
             );
             if (files && files.length > 0) {
-                files.forEach((uploadFile) => {
+                files.forEach((uploadFile: UploadFile) => {
                     if (uploadFile.originFileObj) {
                         formData.append('file[]', uploadFile.originFileObj);
                     }
-                    /*else if (uploadFile.url) {
-                        console.log('Файл уже загружен:', uploadFile.url);
-                    }*/
                 });
             }
             console.log(to);
@@ -241,10 +261,11 @@ export const ChatSocketProvider = ({ children, url }) => {
             setLoadingSendSms(false);
         }
     }, [loadingSendSms]);
-    const markMessagesAsRead = useCallback(async (messageIds, chatId) => {
+    const markMessagesAsRead = useCallback(async (messageIds: number[]) => {
         for (const id of messageIds) {
             if (PRODMODE) {
                 try {
+                    if (!PROD_AXIOS_INSTANCE) return;
                     const endpoint = `/api/sms/read/${id}`;
                     const response = await PROD_AXIOS_INSTANCE.post(endpoint, {
                         _token: CSRF_TOKEN,
@@ -263,20 +284,21 @@ export const ChatSocketProvider = ({ children, url }) => {
         }
     }, []);
 
-    const insertMessagesToArrays = (to, text, files, answer, timestamp, from_id) => {
+    const insertMessagesToArrays = ({to, text, answer, timestamp, from_id}: toSendSms) => {
         addMessageToChat({
             from_id: from_id,
             id: timestamp,
             text: text,
-            files: files,
+            files: [],
             created_at: timestamp,
             updated_at: timestamp,
-            answer: null,
+            answer: answer,
+            status: false,
             isLocal: true,
             isSending: true,
         }, to);
     };
-    const setChatsPrepare = (newChat) => {
+    const setChatsPrepare = (newChat: Chat) => {
         const chat = chatsRef.current.find(chat => +chat.chat_id === +newChat.chat_id);
         if (!chat) {
             console.log('BEFORE UPDATE CHATS fetchChatMessages', chatsRef.current);
@@ -287,8 +309,7 @@ export const ChatSocketProvider = ({ children, url }) => {
                 messages: [...newChat.messages, ...chat.messages],
             };
             setChats(prevChats => {
-                //[...prevChats, newChat]
-                return prevChats.map((chat, index) => {
+                return prevChats.map((chat) => {
                     if (chat.chat_id === chatUpd.chat_id) {
                         return chatUpd;
                     }
@@ -297,7 +318,7 @@ export const ChatSocketProvider = ({ children, url }) => {
             });
         }
     };
-    const addMessageToChatList = (msg, isSelfMsg = true) => {
+    const addMessageToChatList = (msg: ChatToList, isSelfMsg: boolean = true) => {
         setChatsList(prevChatsList => {
             let chatIndex = -1;
             if (isSelfMsg) {
@@ -324,7 +345,7 @@ export const ChatSocketProvider = ({ children, url }) => {
             }
         });
     };
-    const addMessageToChat = (msg, to = null) => {
+    const addMessageToChat = (msg: ChatMessage, to: number | null = null) => {
         setChats(prevChats => {
             const chatIdToUpdate = to || msg.from_id;
             const chatIndex = prevChats.findIndex(chat => chat.chat_id === chatIdToUpdate);
@@ -343,7 +364,7 @@ export const ChatSocketProvider = ({ children, url }) => {
             });
         });
     };
-    const updateMessageId = (id, timestamp, files, to) => {
+    const updateMessageId = (id: number, timestamp: number, files: File[], to: number) => {
         setChats(prevChats => {
             const chatIndex = prevChats.findIndex(chat => chat.chat_id === to);
 
@@ -374,7 +395,7 @@ export const ChatSocketProvider = ({ children, url }) => {
             });
         });
     };
-    const updateMessageStatus = (msg, to, isSelfMsg = true) => {
+    const updateMessageStatus = (msg: ChatMessage, to: number, isSelfMsg: boolean = true) => {
         setChats(prevChats => {
             let chatIndex = -1;
             if (isSelfMsg) {
@@ -408,7 +429,7 @@ export const ChatSocketProvider = ({ children, url }) => {
             });
         });
     };
-    const updateChatListCountUnread = (from, updCountUnread) => {
+    const updateChatListCountUnread = (from: number, updCountUnread: number) => {
         setChatsList(prevChatsList => {
             let chatIndex = -1;
             chatIndex = prevChatsList.findIndex(chat => chat.chat_id === from);
@@ -428,8 +449,6 @@ export const ChatSocketProvider = ({ children, url }) => {
         <ChatSocketContext.Provider
             value={{
                 /* socket */
-                on,
-                off,
                 connected,
                 connectionStatus,
                 refreshKey,
@@ -449,12 +468,15 @@ export const ChatSocketProvider = ({ children, url }) => {
                 sendSms,
                 markMessagesAsRead,
 
+                userdata,
+                CSRF_TOKEN,
+                PRODMODE,
+                PROD_AXIOS_INSTANCE,
+
                 setUserData,
                 SET_CSRF_TOKEN,
                 SET_PRODMODE,
                 SET_PROD_AXIOS_INSTANCE,
-                SET_HTTP_HOST,
-                SET_BFF_PORT,
             }}
         >
             {children}

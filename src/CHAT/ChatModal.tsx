@@ -3,7 +3,7 @@ import { Modal } from 'antd';
 import Draggable from 'react-draggable';
 import { CloseOutlined } from '@ant-design/icons';
 import ChatLayout from './ChatLayout';
-import styles from './chat_styles.module.css';
+import styles from './styles/chat_styles.module.css';
 
 export const ChatModal = ({ open, onOk, onCancel, smsData, positionCorner }) => {
     const dragRef = useRef(null);

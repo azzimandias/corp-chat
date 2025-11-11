@@ -59,3 +59,62 @@ export interface User {
     id_company: number,
     super: number | null,
 }
+
+export interface AlertInfo {
+    message: string,
+    description: string,
+    type: "success" | "info" | "warning" | "error"
+}
+
+export interface ChatToList {
+    id: number,
+    chat_id: number,
+    text: string,
+    files: string[],
+    status: boolean,
+    created_at: number,
+    updated_at: number,
+    count_unread: number,
+    from: From,
+    to: To,
+}
+
+export interface From {
+    id: number,
+    name: string,
+    surname: string,
+}
+
+export interface To {
+    id: number,
+    name: string,
+    surname: string,
+}
+
+export interface Chat {
+    chat_id: number,
+    who: string,
+    messages: ChatMessage[],
+    total: number,
+}
+
+export interface ChatMessage {
+    id: number,
+    from_id: number,
+    answer: number | null,
+    text: string,
+    files: File[],
+    status: boolean,
+    created_at: number,
+    updated_at: number,
+    from?: number,
+    isLocal?: boolean,
+    isSending?: boolean,
+}
+
+export interface File {
+    id: number,
+    route: string,
+    extension: string,
+    name: string,
+}

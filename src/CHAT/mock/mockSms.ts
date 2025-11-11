@@ -39,6 +39,7 @@ export const CHAT_LIST_MOCK = {
                 status: false,
                 created_at: 1757342962,
                 updated_at: 1757342963,
+                count_unread: 0,
             },
             {
                 id: 300,
@@ -58,6 +59,7 @@ export const CHAT_LIST_MOCK = {
                 status: false,
                 created_at: 1757341894,
                 updated_at: 1757341895,
+                count_unread: 0,
             },
             {
                 id: 2,
@@ -77,6 +79,7 @@ export const CHAT_LIST_MOCK = {
                 status: false,
                 created_at: 1757341892,
                 updated_at: 1757341892,
+                count_unread: 0,
             },
             {
                 id: 5,
@@ -96,6 +99,7 @@ export const CHAT_LIST_MOCK = {
                 status: false,
                 created_at: 1757341934,
                 updated_at: 1757341934,
+                count_unread: 0,
             },
             {
                 id: 8,
@@ -115,6 +119,7 @@ export const CHAT_LIST_MOCK = {
                 status: false,
                 created_at: 1757341800,
                 updated_at: 1757341800,
+                count_unread: 0,
             },
             {
                 id: 12,
@@ -134,6 +139,7 @@ export const CHAT_LIST_MOCK = {
                 status: false,
                 created_at: 1757341930,
                 updated_at: 1757341930,
+                count_unread: 0,
             },
             {
                 id: 132,
@@ -153,6 +159,7 @@ export const CHAT_LIST_MOCK = {
                 status: false,
                 created_at: 1757341850,
                 updated_at: 1757341850,
+                count_unread: 0,
             },
             {
                 id: 137,
@@ -172,6 +179,7 @@ export const CHAT_LIST_MOCK = {
                 status: false,
                 created_at: 1757341930,
                 updated_at: 1757341930,
+                count_unread: 0,
             },
         ],
         total_unread: 10,

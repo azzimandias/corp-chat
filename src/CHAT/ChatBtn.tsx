@@ -1,37 +1,20 @@
-import styles from './style/Chat.module.css';
+import styles from './styles/chat_styles.module.css';
 import {useEffect, useMemo, useState} from 'react';
 import {Button, Dropdown, Space} from 'antd';
 import {MessageOutlined} from '@ant-design/icons';
 import {ChatModal} from './ChatModal.jsx';
 import {useChatSocket} from "./context/ChatSocketContext";
-import type {ChatParams} from "./types/types.ts";
+import type {UserData} from "./types/types.ts";
 
-const ChatBtn = ({userdata, CSRF_TOKEN, PRODMODE, PROD_AXIOS_INSTANCE}: ChatParams) => {
+const ChatBtn = ({ userdata }: { userdata: UserData }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const {
         connected,           // boolean - подключен ли WebSocket
         totalUnread,         // количество непрочитанных сообщений
         chatsList,           // [] - список чатов
         fetchChatsList,
-
-        SET_CSRF_TOKEN,
-        SET_PRODMODE,
-        SET_PROD_AXIOS_INSTANCE,
-        setUserData,
     } = useChatSocket();
     const [currentUserId, setCurrentUserId] = useState(0);
-
-    useEffect(() => {
-        if (userdata) setUserData(userdata);
-        if (CSRF_TOKEN) SET_CSRF_TOKEN(CSRF_TOKEN);
-        if (PRODMODE) SET_PRODMODE(PRODMODE);
-        if (PROD_AXIOS_INSTANCE) SET_PROD_AXIOS_INSTANCE(PROD_AXIOS_INSTANCE);
-    }, [
-        setUserData,
-        SET_CSRF_TOKEN,
-        SET_PRODMODE,
-        SET_PROD_AXIOS_INSTANCE
-    ]);
 
     useEffect(() => {
         if (!connected) {
