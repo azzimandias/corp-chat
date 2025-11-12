@@ -1,4 +1,4 @@
-import styles from './style/Chat.module.css';
+import styles from '../styles/chat_styles.module.css';
 import dayjs from 'dayjs';
 import {
     FileExcelFilled,
@@ -14,7 +14,12 @@ import {
 import {useChatSocket} from "../context/ChatSocketContext.tsx";
 import type {Normalized} from "../types/types.ts";
 
-export default function ChatIncomingMsg({ message }: { message: Normalized }) {
+export default function ChatIncomingMsg({ message }: { message: Normalized | undefined }) {
+
+    if (!message) {
+        return null;
+    }
+
     const { text, files, timestamp, senderName } = message;
 
     const {

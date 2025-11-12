@@ -7,7 +7,7 @@ import {
     PaperClipOutlined,
 } from '@ant-design/icons';
 import EmojiPicker, {type EmojiClickData} from 'emoji-picker-react';
-import styles from './style/Chat.module.css';
+import styles from '../styles/chat_styles.module.css';
 import type {UploadChangeParam} from "antd/es/upload";
 
 export function ChatInput({ onSend }: { onSend: (trimmed: string, fileList: UploadFile[]) => void }) {

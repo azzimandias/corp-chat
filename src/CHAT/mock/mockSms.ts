@@ -22,46 +22,6 @@ export const CHAT_LIST_MOCK = {
                 count_unread: 10,
             },
             {
-                id: 250,
-                chat_id: 540,
-                from: {
-                    name: 'Анатолий',
-                    surname: 'Дроботенко',
-                    id: 540,
-                },
-                to: {
-                    surname: 'Ковалев',
-                    name: 'Анатолий',
-                    id: 46,
-                },
-                text: 'Опять???',
-                files: [],
-                status: false,
-                created_at: 1757342962,
-                updated_at: 1757342963,
-                count_unread: 0,
-            },
-            {
-                id: 300,
-                chat_id: 52,
-                from: {
-                    surname: 'Ковалева',
-                    name: 'Валентина',
-                    id: 52,
-                },
-                to: {
-                    surname: 'Ковалев',
-                    name: 'Анатолий',
-                    id: 46,
-                },
-                text: 'ЭЙ!!!',
-                files: [],
-                status: false,
-                created_at: 1757341894,
-                updated_at: 1757341895,
-                count_unread: 0,
-            },
-            {
                 id: 2,
                 chat_id: 52,
                 from: {

@@ -1,8 +1,8 @@
+import * as React from 'react';
 import {createContext, useCallback, useContext, useEffect, useRef, useState} from 'react';
 import {io, Socket} from 'socket.io-client';
 import {CHAT_LIST_MOCK, CHAT_MOCK, CHAT_MOCK_NEW} from '../mock/mockSms.js';
 import dayjs from "dayjs";
-import * as React from "react";
 import type {AxiosInstance} from "axios";
 import type {AlertInfo, Chat, ChatMessage, ChatToList, File, UserData} from "../types/types.ts";
 import type {UploadFile} from "antd";
@@ -28,14 +28,20 @@ interface ChatSocketContextType {
 
     userdata: UserData | null;
     setUserData: (data: UserData) => void;
+
     HTTP_HOST: string | null;
-    SET_HTTP_HOST: (token: string) => void;
+    SET_HTTP_HOST: (host: string) => void;
     CSRF_TOKEN: string | null;
     SET_CSRF_TOKEN: (token: string) => void;
     PRODMODE: boolean | null;
     SET_PRODMODE: (mode: boolean) => void;
     PROD_AXIOS_INSTANCE: AxiosInstance | null;
     SET_PROD_AXIOS_INSTANCE: (instance: AxiosInstance) => void;
+
+    setFetchChatsListPath: (path: string | null) => void;
+    setFetchChatMessagesPath: (path: string | null) => void;
+    setSendSmsPath: (path: string | null) => void;
+    setMarkMessagesAsReadPath: (path: string | null) => void;
 }
 
 interface toSendSms {
@@ -61,6 +67,11 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
     const [CSRF_TOKEN, SET_CSRF_TOKEN] = useState<string>('');
     const [PRODMODE, SET_PRODMODE] = useState<boolean>(false);
     const [PROD_AXIOS_INSTANCE, SET_PROD_AXIOS_INSTANCE] = useState<AxiosInstance | null>(null);
+
+    const [fetchChatsListPath, setFetchChatsListPath] = useState<string | null>(null);
+    const [fetchChatMessagesPath, setFetchChatMessagesPath] = useState<string | null>(null);
+    const [sendSmsPath, setSendSmsPath] = useState<string | null>(null);
+    const [markMessagesAsReadPath, setMarkMessagesAsReadPath] = useState<string | null>(null);
 
     const [chatsList, setChatsList] = useState<ChatToList[]>([]); // боковой список чатов (последнее сообщение)
     const chatsListRef = useRef(chatsList);
@@ -156,9 +167,8 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
         setLoadingChatList(true);
         if (PRODMODE) {
             try {
-                if (!PROD_AXIOS_INSTANCE) return;
-                const endpoint = `/api/sms`;
-                const response = await PROD_AXIOS_INSTANCE.post(endpoint, {
+                if (!PROD_AXIOS_INSTANCE || !fetchChatsListPath) return;
+                const response = await PROD_AXIOS_INSTANCE.post(fetchChatsListPath, { /* `/api/sms` */
                     data: {search},
                     _token: CSRF_TOKEN,
                 });
@@ -182,9 +192,8 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
         setLoadingChat(true);
         if (PRODMODE) {
             try {
-                if (!PROD_AXIOS_INSTANCE) return;
-                const endpoint = `/api/sms/${chatId}`;
-                const response = await PROD_AXIOS_INSTANCE.post(endpoint, {
+                if (!PROD_AXIOS_INSTANCE || !fetchChatMessagesPath) return;
+                const response = await PROD_AXIOS_INSTANCE.post(fetchChatMessagesPath, { /* `/api/sms/${chatId}` */
                     data: {
                         last_id: lastMsg,
                     },
@@ -229,7 +238,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
         insertMessagesToArrays({to, text, answer, timestamp, from_id});
         setLoadingSendSms(true);
         try {
-            if (!PROD_AXIOS_INSTANCE) return;
+            if (!PROD_AXIOS_INSTANCE || !sendSmsPath) return;
             const formData = new FormData();
             formData.append('_token', CSRF_TOKEN);
             formData.append(
@@ -249,7 +258,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 });
             }
             console.log(to);
-            const response = await PROD_AXIOS_INSTANCE.post('/api/sms/create/sms', formData);
+            const response = await PROD_AXIOS_INSTANCE.post(sendSmsPath, formData); /* '/api/sms/create/sms' */
 
             console.log('[useSendSms] Ответ от сервера:', response);
 
@@ -267,8 +276,8 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
         for (const id of messageIds) {
             if (PRODMODE) {
                 try {
-                    if (!PROD_AXIOS_INSTANCE) return;
-                    const endpoint = `/api/sms/read/${id}`;
+                    if (!PROD_AXIOS_INSTANCE || !markMessagesAsReadPath) return;
+                    const endpoint = `${markMessagesAsReadPath}/${id}`; /* '/api/sms/read' */
                     const response = await PROD_AXIOS_INSTANCE.post(endpoint, {
                         _token: CSRF_TOKEN,
                     });
@@ -471,16 +480,23 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 markMessagesAsRead,
 
                 userdata,
+
                 HTTP_HOST,
                 CSRF_TOKEN,
                 PRODMODE,
                 PROD_AXIOS_INSTANCE,
 
                 setUserData,
+
                 SET_HTTP_HOST,
                 SET_CSRF_TOKEN,
                 SET_PRODMODE,
                 SET_PROD_AXIOS_INSTANCE,
+
+                setFetchChatsListPath,
+                setFetchChatMessagesPath,
+                setSendSmsPath,
+                setMarkMessagesAsReadPath,
             }}
         >
             {children}

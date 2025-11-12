@@ -1,4 +1,4 @@
-import styles from './style/Chat.module.css';
+import styles from '../styles/chat_styles.module.css';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import dayjs from 'dayjs';
 import {Empty, FloatButton, Layout, type UploadFile} from 'antd';
@@ -14,7 +14,7 @@ import {ArrowDownOutlined, LoadingOutlined} from "@ant-design/icons";
 import type {Chat, ChatMessage, messagesWithDividersInterface} from "../types/types.ts";
 
 export default function ChatContent({ chatId }: { chatId: number }) {
-    const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement | null>(null);
     const MemoChatSelfMsg = React.memo(ChatSelfMsg);
     const MemoChatIncomingMsg = React.memo(ChatIncomingMsg);
     const MemoChatDivider = React.memo(ChatDivider);
@@ -178,17 +178,17 @@ export default function ChatContent({ chatId }: { chatId: number }) {
                 </div>
                 <div className={styles.chat_body} ref={messagesContainerRef}>
                     {(messagesWithDividers && messagesWithDividers.length > 0) ? messagesWithDividers.map((item: messagesWithDividersInterface) =>
-                        item.type === 'divider' ? (
+                        (item.type === 'divider' && !item?.message) ? (
                             <MemoChatDivider key={item.id}>
                                 {item.timestamp ? dayjs(+item.timestamp * 1000).format('DD.MM.YY').toString() : ''}
                             </MemoChatDivider>
                         ) : item?.message?.fromId && currentUserId && (+item?.message?.fromId === +currentUserId) ? (
                             <MemoChatSelfMsg key={item?.message?.id}
-                                             message={item.message}
+                                             message={item?.message}
                             />
                         ) : (
                             <MemoChatIncomingMsg key={item?.message?.id}
-                                                 message={item.message}
+                                                 message={item?.message}
                                                  data-message-id={item?.message?.id}
                             />
                         )

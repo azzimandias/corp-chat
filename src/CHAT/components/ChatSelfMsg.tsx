@@ -1,4 +1,4 @@
-import styles from './style/Chat.module.css';
+import styles from '../styles/chat_styles.module.css';
 import dayjs from 'dayjs';
 import {
     CheckOutlined,

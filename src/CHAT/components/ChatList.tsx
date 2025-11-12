@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useMemo} from 'react';
-import styles from './style/Chat.module.css';
+import styles from '../styles/chat_styles.module.css';
 import {useChatSocket} from "../context/ChatSocketContext";
 import {Badge} from "antd";
 import type {ChatToList} from "../types/types.ts";

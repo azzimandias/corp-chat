@@ -4,27 +4,36 @@ import {ChatSocketProvider, useChatSocket} from './CHAT/context/ChatSocketContex
 import type {ChatParams} from "./CHAT/types/types.ts";
 import {useEffect} from "react";
 
-const AppContent = ({userdata, HTTP_HOST, CSRF_TOKEN, PRODMODE, PROD_AXIOS_INSTANCE}: ChatParams) => {
+const AppContent = ({userdata, httpParams, fetchParams}: ChatParams) => {
     const {
         setUserData,
+
         SET_HTTP_HOST,
         SET_CSRF_TOKEN,
         SET_PRODMODE,
         SET_PROD_AXIOS_INSTANCE,
+
+        setFetchChatsListPath,
+        setFetchChatMessagesPath,
+        setSendSmsPath,
+        setMarkMessagesAsReadPath,
     } = useChatSocket();
 
     useEffect(() => {
         if (userdata) setUserData(userdata);
-        if (HTTP_HOST) SET_HTTP_HOST(HTTP_HOST);
-        if (CSRF_TOKEN) SET_CSRF_TOKEN(CSRF_TOKEN);
-        if (PRODMODE) SET_PRODMODE(PRODMODE);
-        if (PROD_AXIOS_INSTANCE) SET_PROD_AXIOS_INSTANCE(PROD_AXIOS_INSTANCE);
+
+        if (httpParams && httpParams?.HTTP_HOST) SET_HTTP_HOST(httpParams?.HTTP_HOST);
+        if (httpParams && httpParams?.CSRF_TOKEN) SET_CSRF_TOKEN(httpParams?.CSRF_TOKEN);
+        if (httpParams && httpParams?.PRODMODE) SET_PRODMODE(httpParams?.PRODMODE);
+        if (httpParams && httpParams?.PROD_AXIOS_INSTANCE) SET_PROD_AXIOS_INSTANCE(httpParams?.PROD_AXIOS_INSTANCE);
+
+        if (fetchParams && fetchParams?.fetchChatsListPath) setFetchChatsListPath(fetchParams?.fetchChatsListPath);
+        if (fetchParams && fetchParams?.fetchChatMessagesPath) setFetchChatMessagesPath(fetchParams?.fetchChatMessagesPath);
+        if (fetchParams && fetchParams?.sendSmsPath) setSendSmsPath(fetchParams?.sendSmsPath);
+        if (fetchParams && fetchParams?.markMessagesAsReadPath) setMarkMessagesAsReadPath(fetchParams?.markMessagesAsReadPath);
     }, [
         userdata,
-        HTTP_HOST,
-        CSRF_TOKEN,
-        PRODMODE,
-        PROD_AXIOS_INSTANCE,
+        httpParams,
         setUserData,
         SET_HTTP_HOST,
         SET_CSRF_TOKEN,
@@ -36,10 +45,10 @@ const AppContent = ({userdata, HTTP_HOST, CSRF_TOKEN, PRODMODE, PROD_AXIOS_INSTA
 }
 
 const App = (props: ChatParams) => {
-    const { PRODMODE, HTTP_HOST, BFF_PORT } = props;
+    const { httpParams } = props;
 
     return (
-        <ChatSocketProvider url={!PRODMODE ? `http://localhost:${BFF_PORT}` : `${HTTP_HOST}:${BFF_PORT}`}>
+        <ChatSocketProvider url={!httpParams?.PRODMODE ? `http://localhost:${httpParams?.BFF_PORT}` : `${httpParams?.HTTP_HOST}:${httpParams?.BFF_PORT}`}>
             <AppContent {...props} />
         </ChatSocketProvider>
     )

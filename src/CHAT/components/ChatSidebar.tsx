@@ -1,4 +1,4 @@
-import styles from './style/Chat.module.css';
+import styles from '../styles/chat_styles.module.css';
 import { useState } from 'react';
 import ChatHeader from './ChatHeader';
 import ChatList from './ChatList';

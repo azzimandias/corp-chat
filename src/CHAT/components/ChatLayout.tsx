@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {Empty, Layout} from 'antd';
 import ChatSidebar from './ChatSidebar';
 import ChatContent from './ChatContent';
-import styles from './style/Chat.module.css';
+import styles from '../styles/chat_styles.module.css';
 
 const { Sider, Content } = Layout;
 

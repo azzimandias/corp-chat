@@ -1,12 +1,24 @@
 import type {AxiosInstance} from "axios";
 
 export interface ChatParams {
-    userdata: UserData,
-    CSRF_TOKEN: string,
-    PRODMODE: boolean,
-    PROD_AXIOS_INSTANCE: AxiosInstance | null,
-    HTTP_HOST: string
-    BFF_PORT: number
+    userdata: UserData;
+    httpParams: HttpParams;
+    fetchParams: FetchParams;
+}
+
+export interface HttpParams {
+    CSRF_TOKEN: string;
+    PRODMODE: boolean;
+    PROD_AXIOS_INSTANCE: AxiosInstance | null;
+    HTTP_HOST: string;
+    BFF_PORT: number;
+}
+
+export interface FetchParams {
+    fetchChatsListPath: string;
+    fetchChatMessagesPath: string;
+    sendSmsPath: string;
+    markMessagesAsReadPath: string;
 }
 
 export interface UserData {

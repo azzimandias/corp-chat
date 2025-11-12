@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Input from 'antd/es/input/Input';
-import styles from './style/Chat.module.css';
+import styles from '../styles/chat_styles.module.css';
 import { SearchOutlined } from '@ant-design/icons';
 
 interface ChatHeaderParams {
