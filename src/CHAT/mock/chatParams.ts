@@ -163,4 +163,25 @@ export const MS_USER = {
     mode: 0,
     duration: 0.0012869834899902344,
     state: [],
+    status: 200,
 };
+export const HTTP_PARAMS = {
+    CSRF_TOKEN: '',
+    PRODMODE: false,
+    PROD_AXIOS_INSTANCE: null,
+    HTTP_HOST: 'localhost',
+    BFF_PORT: 5501,
+}
+export const FETCH_PARAMS = {
+    fetchChatsListPath: '',
+    fetchChatMessagesPath: '',
+    sendSmsPath: '',
+    markMessagesAsReadPath: '',
+}
+export const SOCKET_SUBSCRIBE = {
+    subscribeToChat: '',
+}
+export const SOCKET_ACTIONS = {
+    newSms: '',
+    updateSms: '',
+}

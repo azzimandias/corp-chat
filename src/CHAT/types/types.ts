@@ -38,7 +38,7 @@ export interface UserData {
     user: User,
     mode: number,
     duration: number,
-    status: number[],
+    status: number,
 }
 
 export interface Company {
@@ -51,8 +51,6 @@ export interface Company {
     color: string,
     ext_address_offers: string,
     path_logo: string,
-    created_at: number,
-    updated_at: number,
     places: Place[],
 }
 
@@ -72,15 +70,15 @@ export interface User {
     surname: string,
     secondname: string,
     occupy: string,
-    passcard: string,
+    passcard: string | null | undefined,
     id_role: number,
-    email: string,
+    email: string | null | undefined,
     sales_role: number,
     password2: string,
     active_company: number,
     id_departament: number,
     id_company: number,
-    super: number | null,
+    super?: number | null,
 }
 
 export interface AlertInfo {

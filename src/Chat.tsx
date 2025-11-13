@@ -1,10 +1,10 @@
-import './App.css'
+import './Chat.css'
 import ChatBtn from "./CHAT/ChatBtn.tsx";
 import {ChatSocketProvider, useChatSocket} from './CHAT/context/ChatSocketContext.tsx';
 import type {ChatParams} from "./CHAT/types/types.ts";
 import {useEffect} from "react";
 
-const AppContent = ({userdata, httpParams, fetchParams, socketSubscribe, socketActions}: ChatParams) => {
+const ChatInner = ({userdata, httpParams, fetchParams, socketSubscribe, socketActions}: ChatParams) => {
     const {
         setUserData,
 
@@ -66,14 +66,14 @@ const AppContent = ({userdata, httpParams, fetchParams, socketSubscribe, socketA
     return <ChatBtn userdata={userdata}/>;
 }
 
-const App = (props: ChatParams) => {
+const Chat = (props: ChatParams) => {
     const { httpParams } = props;
 
     return (
         <ChatSocketProvider url={!httpParams?.PRODMODE ? `http://localhost:${httpParams?.BFF_PORT}` : `${httpParams?.HTTP_HOST}:${httpParams?.BFF_PORT}`}>
-            <AppContent {...props} />
+            <ChatInner {...props} />
         </ChatSocketProvider>
     )
 }
 
-export default App;
+export default Chat;
