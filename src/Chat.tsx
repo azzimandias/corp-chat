@@ -24,6 +24,12 @@ const ChatInner = ({userdata, httpParams, fetchParams, socketSubscribe, socketAc
     } = useChatSocket();
 
     useEffect(() => {
+        console.log('userdata', userdata);
+        console.log('httpParams', httpParams);
+        console.log('fetchParams', fetchParams);
+        console.log('socketSubscribe', socketSubscribe);
+        console.log('socketActions', socketActions);
+
         if (userdata) setUserData(userdata);
 
         if (httpParams && httpParams?.HTTP_HOST) SET_HTTP_HOST(httpParams?.HTTP_HOST);

@@ -94,8 +94,9 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
         <Button style={{ background: 'transparent' }} type="primary" onClick={showModal}>
             <MessageOutlined />
             {totalUnread > 0 && (
-                <span className={styles['notification-badge']}>{totalUnread}</span>
+                <span className={styles['notification-badge']}>{totalUnread},</span>
             )}
+            <span className={styles['notification-badge']}>{currentUserId}</span>
         </Button>
     );
 
