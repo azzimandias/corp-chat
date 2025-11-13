@@ -47,6 +47,11 @@ export default function ChatList({ search, onSelectChat, selectedChatId }: ChatL
         return `${user?.surname ?? ''} ${user?.name ?? ''}`.trim();
     }, []);
 
+    const truncateToTwoLines = (text: string, maxLength: number = 100) => {
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    };
+
     const chats = useMemo(() => {
         const normalizedSearch = search.toLowerCase();
 
@@ -63,19 +68,6 @@ export default function ChatList({ search, onSelectChat, selectedChatId }: ChatL
             return sms && (displayName.toLowerCase().includes(normalizedSearch) ||
                 messageText.includes(normalizedSearch));
         });
-
-        // Группировка по chat_id с выбором последнего сообщения
-        /*const uniqueChatsMap = filtered.reduce((acc, sms) => {
-            const chatId = sms?.chat_id;
-            const currentTime = sms?.updated_at || sms?.created_at;
-            const existing = acc[chatId];
-
-            if (!existing || currentTime > (existing.updated_at || existing.created_at)) {
-                acc[chatId] = sms;
-            }
-
-            return acc;
-        }, {});*/
 
         //const result = Object.values(uniqueChatsMap).sort((a, b) => {
         const result = Object.values(filtered).sort((a, b) => {
@@ -113,21 +105,7 @@ export default function ChatList({ search, onSelectChat, selectedChatId }: ChatL
                     const role = getRole(chat);
                     const displayName = getDisplayName(chat, role, chat.chat_id === currentUserId);
                     const isActive = chat.chat_id === selectedChatId;
-
-                    const lastMessageText = chat.text /*|| (
-                        <div>
-                            <FileOutlined /> Файл
-                        </div>
-                    )*/;
-
-/*// Проверяем, является ли lastMessageText строкой перед обрезкой
-                    const truncatedText = false
-                        ? typeof lastMessageText === 'string'
-                            ? lastMessageText.length > 20
-                                ? `${lastMessageText.slice(0, 20)} ...`
-                                : lastMessageText
-                            : lastMessageText
-                        : lastMessageText;*/
+                    const lastMessageText = chat.text;
                     return (
                         <div key={`chat-${chat.chat_id}-${idx}`}>
                             <li
@@ -137,8 +115,8 @@ export default function ChatList({ search, onSelectChat, selectedChatId }: ChatL
                                 }}
                             >
                                 <div>
-                                    <div className={styles.companionName}>{displayName || 'Неизвестный'}</div>
-                                    <div className={styles.lastMessage}>{lastMessageText}</div>
+                                    <div className={styles['companionName']}>{displayName || 'Неизвестный'}</div>
+                                    <div className={styles['last-message']}>{truncateToTwoLines(lastMessageText, 50)}</div>
                                 </div>
                                 <Badge count={chat.count_unread} />
                             </li>

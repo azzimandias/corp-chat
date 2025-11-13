@@ -66,7 +66,8 @@ ul {
 .chat-list > * {
     margin: 0;
     border-bottom: 1px solid #e6e6e6;
-    padding: 7px 0;
+    height: 77px;
+    /*padding: 7px 0;*/
 }
 
 .chat-item {
@@ -74,6 +75,7 @@ ul {
 }
 
 .last-message {
+    height: 44px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -83,6 +85,9 @@ ul {
     white-space: normal;
     font-size: 0.9em;
     color: #555;
+}
+.activeChatItem .last-message {
+    color: #f3f1f1;
 }
 
 /* Стили сообщения */
@@ -245,6 +250,7 @@ ul {
     opacity: 0.5;
 }
 .chatItem {
+    height: 77px;
     padding: 5px;
     display: flex;
     align-items: center;
