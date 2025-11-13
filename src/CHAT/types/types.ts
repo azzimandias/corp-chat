@@ -4,6 +4,8 @@ export interface ChatParams {
     userdata: UserData;
     httpParams: HttpParams;
     fetchParams: FetchParams;
+    socketSubscribe: SocketSubscribe;
+    socketActions: SocketActions;
 }
 
 export interface HttpParams {
@@ -19,6 +21,15 @@ export interface FetchParams {
     fetchChatMessagesPath: string;
     sendSmsPath: string;
     markMessagesAsReadPath: string;
+}
+
+export interface SocketSubscribe {
+    subscribeToChat: string;
+}
+
+export interface SocketActions {
+    newSms: string;
+    updateSms: string;
 }
 
 export interface UserData {

@@ -4,7 +4,7 @@ import {ChatSocketProvider, useChatSocket} from './CHAT/context/ChatSocketContex
 import type {ChatParams} from "./CHAT/types/types.ts";
 import {useEffect} from "react";
 
-const AppContent = ({userdata, httpParams, fetchParams}: ChatParams) => {
+const AppContent = ({userdata, httpParams, fetchParams, socketSubscribe, socketActions}: ChatParams) => {
     const {
         setUserData,
 
@@ -17,6 +17,10 @@ const AppContent = ({userdata, httpParams, fetchParams}: ChatParams) => {
         setFetchChatMessagesPath,
         setSendSmsPath,
         setMarkMessagesAsReadPath,
+
+        setSubscribeToChat,
+        setNewSms,
+        setUpdateSms,
     } = useChatSocket();
 
     useEffect(() => {
@@ -31,14 +35,32 @@ const AppContent = ({userdata, httpParams, fetchParams}: ChatParams) => {
         if (fetchParams && fetchParams?.fetchChatMessagesPath) setFetchChatMessagesPath(fetchParams?.fetchChatMessagesPath);
         if (fetchParams && fetchParams?.sendSmsPath) setSendSmsPath(fetchParams?.sendSmsPath);
         if (fetchParams && fetchParams?.markMessagesAsReadPath) setMarkMessagesAsReadPath(fetchParams?.markMessagesAsReadPath);
+
+        if (socketSubscribe && socketSubscribe?.subscribeToChat) setSubscribeToChat(socketSubscribe?.subscribeToChat);
+        if (socketActions && socketActions?.newSms) setNewSms(socketActions?.newSms);
+        if (socketActions && socketActions?.updateSms) setUpdateSms(socketActions?.updateSms);
     }, [
         userdata,
         httpParams,
+        fetchParams,
+        socketSubscribe,
+        socketActions,
+
         setUserData,
+
         SET_HTTP_HOST,
         SET_CSRF_TOKEN,
         SET_PRODMODE,
         SET_PROD_AXIOS_INSTANCE,
+
+        setFetchChatsListPath,
+        setFetchChatMessagesPath,
+        setSendSmsPath,
+        setMarkMessagesAsReadPath,
+
+        setSubscribeToChat,
+        setNewSms,
+        setUpdateSms,
     ]);
 
     return <ChatBtn userdata={userdata}/>;

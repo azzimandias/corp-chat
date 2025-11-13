@@ -10,7 +10,7 @@ import type {UploadFile} from "antd";
 interface ChatSocketContextType {
     connected: boolean;
     connectionStatus: string;
-    refreshKey: number;
+    //refreshKey: number;
     isAlertVisibleKey: number;
     alertInfo: AlertInfo;
     totalUnread: number;
@@ -25,6 +25,10 @@ interface ChatSocketContextType {
     fetchChatMessages: (chatId: number, lastMsg: number | null) => void;
     sendSms: ({ to, text, files, answer, timestamp, from_id }: toSendSms) => void;
     markMessagesAsRead: (messageIds: (number | undefined)[]) => void;
+
+    setSubscribeToChat: (search: string | null) => void;
+    setNewSms: (search: string | null) => void;
+    setUpdateSms: (search: string | null) => void;
 
     userdata: UserData | null;
     setUserData: (data: UserData) => void;
@@ -73,6 +77,10 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
     const [sendSmsPath, setSendSmsPath] = useState<string | null>(null);
     const [markMessagesAsReadPath, setMarkMessagesAsReadPath] = useState<string | null>(null);
 
+    const [subscribeToChat, setSubscribeToChat] = useState<string | null>(null);
+    const [newSms, setNewSms] = useState<string | null>(null);
+    const [updateSms, setUpdateSms] = useState<string | null>(null);
+
     const [chatsList, setChatsList] = useState<ChatToList[]>([]); // боковой список чатов (последнее сообщение)
     const chatsListRef = useRef(chatsList);
     const [chats, setChats] = useState<Chat[]>([]); // все чаты
@@ -85,7 +93,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
     const [loadingChat, setLoadingChat] = useState<boolean>(false); // ожидаем ответа с чатом
     const [loadingSendSms, setLoadingSendSms] = useState<boolean>(false); // ожидаем ответа при отправке сообщения
 
-    const [refreshKey, setRefreshKey] = useState<number>(0);
+    //const [refreshKey, setRefreshKey] = useState<number>(0);
     const [isAlertVisibleKey, setIsAlertVisibleKey] = useState<number>(0);
     const [alertInfo, setAlertInfo] = useState<AlertInfo>({
         message: '',
@@ -110,32 +118,33 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 console.error('User ID is undefined');
                 return;
             }
-            socket.emit('subscribeToChat', userId);
+            socket.emit(subscribeToChat ?? '', userId);
         });
         // --- получаем новое сообщение ---
-        socket.on('new:sms', (data) => {
-            console.log('WS new:sms', data);
+        socket.on(newSms ?? '', (data) => {
+            console.log(`WS ${newSms}`, data);
 
             if (data.left) addMessageToChatList(data.left, false);
             if (data.left) setTotalUnread(data.left?.total_unread);
             if (data.right) addMessageToChat(data.right);
-        });
-        socket.on('update:sms', (data) => {
-            console.log('WS update:sms', data);
-            if (data.sms) updateMessageStatus(data.sms, data.sms.to, true);
-        });
-        socket.on('new:notification', (data) => {
-            console.log('WS new:notification', data);
-            setRefreshKey(dayjs().unix());
+
             setIsAlertVisibleKey(dayjs().unix());
             setAlertInfo({
                 message: 'Новое уведомление.',
-                description: data.message,
-                type: 'info',
+                description: '',
+                type: 'success',
             });
         });
-        socket.on('read:notification', () => {
-            setRefreshKey(dayjs().unix());
+        socket.on(updateSms ?? '', (data) => {
+            console.log(`WS ${updateSms}`, data);
+            if (data.sms) updateMessageStatus(data.sms, data.sms.to, true);
+
+            setIsAlertVisibleKey(dayjs().unix());
+            setAlertInfo({
+                message: 'Новое уведомление.',
+                description: '',
+                type: 'success',
+            });
         });
         socket.on('disconnect', () => {
             console.log('CHAT WEBSOCKET DISCONNECTED');
@@ -462,7 +471,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 /* socket */
                 connected,
                 connectionStatus,
-                refreshKey,
+                //refreshKey,
                 isAlertVisibleKey,
                 alertInfo,
                 /* chats info */
@@ -497,6 +506,10 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 setFetchChatMessagesPath,
                 setSendSmsPath,
                 setMarkMessagesAsReadPath,
+
+                setSubscribeToChat,
+                setNewSms,
+                setUpdateSms,
             }}
         >
             {children}
