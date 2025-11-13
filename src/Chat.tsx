@@ -1,6 +1,6 @@
 import './Chat.css'
-import ChatBtn from "./CHAT/ChatBtn.tsx";
-import {ChatSocketProvider, useChatSocket} from './CHAT/context/ChatSocketContext.tsx';
+import ChatBtn from "./CHAT/ChatBtn";
+import {ChatSocketProvider, useChatSocket} from './CHAT/context/ChatSocketContext';
 import type {ChatParams} from "./CHAT/types/types.ts";
 import {useEffect} from "react";
 
@@ -68,6 +68,14 @@ const ChatInner = ({userdata, httpParams, fetchParams, socketSubscribe, socketAc
 
 const Chat = (props: ChatParams) => {
     const { httpParams } = props;
+
+    useEffect(() => {
+        console.log('CORP-CHAT MOUNTED')
+    }, []);
+
+    useEffect(() => {
+        console.log('CORP-CHAT PARAMS', props)
+    }, [props]);
 
     return (
         <ChatSocketProvider url={!httpParams?.PRODMODE ? `http://localhost:${httpParams?.BFF_PORT}` : `${httpParams?.HTTP_HOST}:${httpParams?.BFF_PORT}`}>

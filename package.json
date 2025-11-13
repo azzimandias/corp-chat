@@ -1,15 +1,66 @@
 {
-  "name": "corp-chat",
-  "private": true,
-  "version": "0.0.0",
+  "name": "corp-chat-library-antd-react-socket",
+  "description": "React chat component with Ant Design and Socket.io support",
+  "version": "1.0.0",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "react",
+    "chat",
+    "antd",
+    "socket.io",
+    "typescript",
+    "component",
+    "ui"
+  ],
+  "author": "azzimandias <passedtrial@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azzimandias/corp-chat"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@ant-design/icons": "^6.1.0",
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.1.0",
+    "antd": "^5.28.0",
+    "axios": "^1.13.2",
+    "emoji-picker-react": "^4.15.0",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-draggable": "^4.5.0",
+    "socket.io-client": "^4.8.1",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.3",
+    "vite": "^7.2.2",
+    "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-lib-inject-css": "^2.2.2"
+  },
+  "peerDependencies": {
     "@ant-design/icons": "^6.1.0",
     "antd": "^5.28.0",
     "axios": "^1.13.2",
@@ -18,19 +69,5 @@
     "react-dom": "^19.2.0",
     "react-draggable": "^4.5.0",
     "socket.io-client": "^4.8.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.0",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.2",
-    "@vitejs/plugin-react": "^5.1.0",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.3",
-    "vite": "^7.2.2"
   }
 }

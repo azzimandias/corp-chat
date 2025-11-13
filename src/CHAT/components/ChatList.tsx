@@ -70,7 +70,7 @@ export default function ChatList({ search, onSelectChat, selectedChatId }: ChatL
         });
 
         //const result = Object.values(uniqueChatsMap).sort((a, b) => {
-        const result = Object.values(filtered).sort((a, b) => {
+        const result = filtered.sort((a: ChatToList, b: ChatToList) => {
             const timeA = a.updated_at || a.created_at;
             const timeB = b.updated_at || b.created_at;
             return timeB - timeA;

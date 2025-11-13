@@ -2,7 +2,7 @@ import styles from './styles/chat_styles.module.css';
 import {useEffect, useMemo, useState} from 'react';
 import {Button, Dropdown, Space} from 'antd';
 import {MessageOutlined} from '@ant-design/icons';
-import {ChatModal} from './components/ChatModal.tsx';
+import {ChatModal} from './components/ChatModal';
 import {useChatSocket} from "./context/ChatSocketContext";
 import type {UserData} from "./types/types.ts";
 

@@ -177,7 +177,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
         if (PRODMODE) {
             try {
                 if (!PROD_AXIOS_INSTANCE || !fetchChatsListPath) return;
-                const response = await PROD_AXIOS_INSTANCE.post(fetchChatsListPath, { /* `/api/sms` */
+                const response = await PROD_AXIOS_INSTANCE.post(fetchChatsListPath, {
                     data: {search},
                     _token: CSRF_TOKEN,
                 });
@@ -202,7 +202,8 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
         if (PRODMODE) {
             try {
                 if (!PROD_AXIOS_INSTANCE || !fetchChatMessagesPath) return;
-                const response = await PROD_AXIOS_INSTANCE.post(fetchChatMessagesPath, { /* `/api/sms/${chatId}` */
+                const endpoint = `${fetchChatMessagesPath}/${chatId}`;
+                const response = await PROD_AXIOS_INSTANCE.post(endpoint, {
                     data: {
                         last_id: lastMsg,
                     },
@@ -267,7 +268,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 });
             }
             console.log(to);
-            const response = await PROD_AXIOS_INSTANCE.post(sendSmsPath, formData); /* '/api/sms/create/sms' */
+            const response = await PROD_AXIOS_INSTANCE.post(sendSmsPath, formData);
 
             console.log('[useSendSms] Ответ от сервера:', response);
 
@@ -286,7 +287,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
             if (PRODMODE) {
                 try {
                     if (!PROD_AXIOS_INSTANCE || !markMessagesAsReadPath) return;
-                    const endpoint = `${markMessagesAsReadPath}/${id}`; /* '/api/sms/read' */
+                    const endpoint = `${markMessagesAsReadPath}/${id}`;
                     const response = await PROD_AXIOS_INSTANCE.post(endpoint, {
                         _token: CSRF_TOKEN,
                     });

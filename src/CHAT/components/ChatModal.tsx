@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { Modal } from 'antd';
 import Draggable, {type DraggableData, type DraggableEvent} from 'react-draggable';
 import { CloseOutlined } from '@ant-design/icons';
-import ChatLayout from './ChatLayout.tsx';
+import ChatLayout from './ChatLayout';
 import styles from '../styles/chat_styles.module.css';
 
 interface ChatModalParams {

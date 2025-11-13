@@ -11,7 +11,7 @@ import {
     FileWordFilled,
     FileZipFilled,
 } from "@ant-design/icons";
-import {useChatSocket} from "../context/ChatSocketContext.tsx";
+import {useChatSocket} from "../context/ChatSocketContext";
 import type {Normalized} from "../types/types.ts";
 
 export default function ChatIncomingMsg({ message }: { message: Normalized | undefined }) {
