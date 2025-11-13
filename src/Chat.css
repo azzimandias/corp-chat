@@ -1,0 +1,8 @@
+:root {
+    --app-top-menu: linear-gradient(178deg, rgba(79, 143, 207, 1) 0%, rgba(41, 92, 143, 1) 100%);
+    --sa-primary-color: #2178fa;
+}
+.ant-layout-sider-children {
+    margin: 0 !important;
+    padding: 0 !important;
+}
