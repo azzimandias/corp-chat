@@ -12,6 +12,7 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
         connected,           // boolean - подключен ли WebSocket
         totalUnread,         // количество непрочитанных сообщений
         chatsList,           // [] - список чатов
+        init,
         fetchChatsList,
     } = useChatSocket();
     const [currentUserId, setCurrentUserId] = useState(0);
@@ -22,8 +23,8 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
         }
     }, [connected]);
     useEffect(() => {
-        //fetchChatsList(null);
-    }, [fetchChatsList, totalUnread]);
+        fetchChatsList(null);
+    }, [init, totalUnread]);
 
     useEffect(() => {
         if (userdata && userdata?.user) {
@@ -44,11 +45,11 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
 
         const messages = chatsList
             .filter((chat) => {
-                const fromId = chat.from?.id || chat.from_id;
-                const toId = chat.to?.id || chat.to_id;
+                const fromId = chat?.from?.id || chat?.from_id;
+                const toId = chat?.to?.id || chat?.to_id;
                 return fromId === currentUserId || toId === currentUserId;
             })
-            .filter((chat) => chat.count_unread > 0)
+            .filter((chat) => chat?.count_unread > 0)
             .map((chat) => {
                 /*const role = getRole(chat);
                 const displayName = getDisplayName(chat, role, false);*/
@@ -94,7 +95,7 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
         <Button style={{ background: 'transparent' }} type="primary" onClick={showModal}>
             <MessageOutlined />
             {totalUnread > 0 && (
-                <span className={styles['notification-badge']}>{totalUnread},</span>
+                <span className={styles['notification-badge']}>{totalUnread}</span>
             )}
         </Button>
     );
