@@ -11,7 +11,7 @@ export interface ChatParams {
 export interface HttpParams {
     CSRF_TOKEN: string;
     PRODMODE: boolean;
-    PROD_AXIOS_INSTANCE: AxiosInstance | null;
+    /*PROD_AXIOS_INSTANCE: AxiosInstance | null;*/
     HTTP_HOST: string;
     BFF_PORT: number;
 }

@@ -4,13 +4,20 @@ import {ChatSocketProvider, useChatSocket} from './CHAT/context/ChatSocketContex
 import type {ChatParams} from "./CHAT/types/types.ts";
 import {useEffect} from "react";
 
-const ChatInner = ({userdata, httpParams, fetchParams, socketSubscribe, socketActions}: ChatParams) => {
+const ChatInner = ({
+                       userdata,
+                       httpParams,
+                       fetchParams,
+                       socketSubscribe,
+                       socketActions
+}: ChatParams) => {
     const {
         setUserData,
 
         SET_HTTP_HOST,
         SET_CSRF_TOKEN,
         SET_PRODMODE,
+        SET_BFF_PORT,
         SET_PROD_AXIOS_INSTANCE,
 
         setFetchChatsListPath,
@@ -24,18 +31,19 @@ const ChatInner = ({userdata, httpParams, fetchParams, socketSubscribe, socketAc
     } = useChatSocket();
 
     useEffect(() => {
-        console.log('userdata', userdata);
-        console.log('httpParams', httpParams);
-        console.log('fetchParams', fetchParams);
-        console.log('socketSubscribe', socketSubscribe);
-        console.log('socketActions', socketActions);
+        console.log('CORP-CHAT userdata', userdata);
+        console.log('CORP-CHAT httpParams', httpParams);
+        console.log('CORP-CHAT fetchParams', fetchParams);
+        console.log('CORP-CHAT socketSubscribe', socketSubscribe);
+        console.log('CORP-CHAT socketActions', socketActions);
 
         if (userdata) setUserData(userdata);
 
         if (httpParams && httpParams?.HTTP_HOST) SET_HTTP_HOST(httpParams?.HTTP_HOST);
         if (httpParams && httpParams?.CSRF_TOKEN) SET_CSRF_TOKEN(httpParams?.CSRF_TOKEN);
         if (httpParams && httpParams?.PRODMODE) SET_PRODMODE(httpParams?.PRODMODE);
-        if (httpParams && httpParams?.PROD_AXIOS_INSTANCE) SET_PROD_AXIOS_INSTANCE(httpParams?.PROD_AXIOS_INSTANCE);
+        if (httpParams && httpParams?.BFF_PORT) SET_BFF_PORT(httpParams?.BFF_PORT);
+        //if (httpParams && httpParams?.PROD_AXIOS_INSTANCE) SET_PROD_AXIOS_INSTANCE(httpParams?.PROD_AXIOS_INSTANCE);
 
         if (fetchParams && fetchParams?.fetchChatsListPath) setFetchChatsListPath(fetchParams?.fetchChatsListPath);
         if (fetchParams && fetchParams?.fetchChatMessagesPath) setFetchChatMessagesPath(fetchParams?.fetchChatMessagesPath);
@@ -57,6 +65,7 @@ const ChatInner = ({userdata, httpParams, fetchParams, socketSubscribe, socketAc
         SET_HTTP_HOST,
         SET_CSRF_TOKEN,
         SET_PRODMODE,
+        SET_BFF_PORT,
         SET_PROD_AXIOS_INSTANCE,
 
         setFetchChatsListPath,
@@ -84,7 +93,7 @@ const Chat = (props: ChatParams) => {
     }, [props]);
 
     return (
-        <ChatSocketProvider url={!httpParams?.PRODMODE ? `http://localhost:${httpParams?.BFF_PORT}` : `${httpParams?.HTTP_HOST}:${httpParams?.BFF_PORT}`}>
+        <ChatSocketProvider>
             <ChatInner {...props} />
         </ChatSocketProvider>
     )

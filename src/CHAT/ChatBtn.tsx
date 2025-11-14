@@ -22,7 +22,7 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
         }
     }, [connected]);
     useEffect(() => {
-        fetchChatsList(null);
+        //fetchChatsList(null);
     }, [fetchChatsList, totalUnread]);
 
     useEffect(() => {
@@ -96,7 +96,6 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
             {totalUnread > 0 && (
                 <span className={styles['notification-badge']}>{totalUnread},</span>
             )}
-            <span className={styles['notification-badge']}>{currentUserId}</span>
         </Button>
     );
 

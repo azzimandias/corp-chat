@@ -3,7 +3,7 @@ import {createContext, useCallback, useContext, useEffect, useRef, useState} fro
 import {io, Socket} from 'socket.io-client';
 import {CHAT_LIST_MOCK, CHAT_MOCK, CHAT_MOCK_NEW} from '../mock/mockSms.js';
 import dayjs from "dayjs";
-import type {AxiosInstance} from "axios";
+import axios, {AxiosInstance} from "axios";
 import type {AlertInfo, Chat, ChatMessage, ChatToList, File, UserData} from "../types/types.ts";
 import type {UploadFile} from "antd";
 
@@ -39,6 +39,7 @@ interface ChatSocketContextType {
     SET_CSRF_TOKEN: (token: string) => void;
     PRODMODE: boolean | null;
     SET_PRODMODE: (mode: boolean) => void;
+    SET_BFF_PORT: (port: number) => void;
     PROD_AXIOS_INSTANCE: AxiosInstance | null;
     SET_PROD_AXIOS_INSTANCE: (instance: AxiosInstance) => void;
 
@@ -59,7 +60,7 @@ interface toSendSms {
 
 export const ChatSocketContext = createContext<ChatSocketContextType | undefined>(undefined);
 
-export const ChatSocketProvider = ({ children, url }: { children: React.ReactNode, url: string, }) => {
+export const ChatSocketProvider = ({ children }: { children: React.ReactNode }) => {
     const socketRef = useRef<Socket | null>(null);
     const [connected, setConnected] = useState<boolean>(false);
     const [connectionStatus, setConnectionStatus] = useState<string>('disconnected');
@@ -70,6 +71,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
     const [HTTP_HOST, SET_HTTP_HOST] = useState<string>('');
     const [CSRF_TOKEN, SET_CSRF_TOKEN] = useState<string>('');
     const [PRODMODE, SET_PRODMODE] = useState<boolean>(false);
+    const [BFF_PORT, SET_BFF_PORT] = useState<number>(0);
     const [PROD_AXIOS_INSTANCE, SET_PROD_AXIOS_INSTANCE] = useState<AxiosInstance | null>(null);
 
     const [fetchChatsListPath, setFetchChatsListPath] = useState<string | null>(null);
@@ -102,11 +104,17 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
     });
 
     const connect = useCallback(() => {
-        if (!PRODMODE) return;
-        if (socketRef.current?.connected) {
+        console.log('connect start');
+        if (!PRODMODE || !BFF_PORT || !HTTP_HOST || !CSRF_TOKEN || !PROD_AXIOS_INSTANCE) {
+            console.log('connect false');
             return;
         }
-        const socket = io(url, { transports: ['websocket', 'polling'], withCredentials: true });
+        if (socketRef.current?.connected) {
+            console.log('connect false');
+            return;
+        }
+        console.log('connect true');
+        const socket = io(`${HTTP_HOST}:${BFF_PORT}`, { transports: ['websocket', 'polling'], withCredentials: true });
         socketRef.current = socket;
         // --- подключение к ws и подписка ---
         socket.on('connect', () => {
@@ -154,16 +162,29 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
         socket.on('connect_error', () => {
             console.log('CHAT WEBSOCKET CONNECT ERROR');
         });
-    }, [url]);
+    }, [PRODMODE, BFF_PORT, HTTP_HOST, CSRF_TOKEN, PROD_AXIOS_INSTANCE, subscribeToChat, newSms, updateSms]);
 
     useEffect(() => {
-        if (userdata) {
-            connect();
+        if (userdata && HTTP_HOST && BFF_PORT && CSRF_TOKEN) {
+            console.log('Attempting to connect with:', { HTTP_HOST, BFF_PORT, userdata });
+            const timer = setTimeout(() => {
+                connect();
+            },0);
+
             return () => {
-                socketRef.current?.disconnect();
+                clearTimeout(timer);
+                console.log('Cleaning up socket connection');
+                //socketRef.current?.disconnect();
             };
+        } else {
+            console.log('Connection conditions not met:', {
+                hasUserdata: !!userdata,
+                hasHTTP_HOST: !!HTTP_HOST,
+                hasBFF_PORT: !!BFF_PORT,
+                hasCSRF_TOKEN: !!CSRF_TOKEN
+            });
         }
-    }, [userdata, connect]);
+    }, [userdata, HTTP_HOST, BFF_PORT, CSRF_TOKEN, connect]);
     useEffect(() => {
         console.log('BEFORE UPDATE CHATS chatsRef', chats);
         chatsRef.current = chats;
@@ -171,12 +192,24 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
     useEffect(() => {
         chatsListRef.current = chatsList;
     }, [chatsList]);
+    useEffect(() => {
+        if (!HTTP_HOST) return;
+        SET_PROD_AXIOS_INSTANCE(axios.create({
+            baseURL: HTTP_HOST,
+            timeout: 300000,
+        }));
+    }, [HTTP_HOST]);
 
     const fetchChatsList = useCallback(async (search: string | null = null) => {
+        console.log('fetchChatsList');
         setLoadingChatList(true);
         if (PRODMODE) {
             try {
-                if (!PROD_AXIOS_INSTANCE || !fetchChatsListPath) return;
+                if (!PROD_AXIOS_INSTANCE || !fetchChatsListPath || !CSRF_TOKEN) {
+                    console.log('fetchChatsList false');
+                    return;
+                }
+                console.log('fetchChatsList true');
                 const response = await PROD_AXIOS_INSTANCE.post(fetchChatsListPath, {
                     data: {search},
                     _token: CSRF_TOKEN,
@@ -191,17 +224,20 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 setLoadingChatList(false);
             }
         } else {
+            console.log('fetchChatsList PRODMODE false');
+        } /*else {
             setChatsList(CHAT_LIST_MOCK?.content?.sms);
             setTotalUnread(CHAT_LIST_MOCK?.content?.total_unread);
             setLoadingChatList(false);
-        }
-    }, [loadingChatList]);
+        }*/
+    }, [loadingChatList, CSRF_TOKEN, PROD_AXIOS_INSTANCE, fetchChatsListPath]);
     const fetchChatMessages = useCallback(async (chatId: number, lastMsg: number | null = null) => {
+        console.log('fetchChatMessages');
         if (loadingChat) return;
         setLoadingChat(true);
         if (PRODMODE) {
             try {
-                if (!PROD_AXIOS_INSTANCE || !fetchChatMessagesPath) return;
+                if (!PROD_AXIOS_INSTANCE || !fetchChatMessagesPath || !CSRF_TOKEN) return;
                 const endpoint = `${fetchChatMessagesPath}/${chatId}`;
                 const response = await PROD_AXIOS_INSTANCE.post(endpoint, {
                     data: {
@@ -223,7 +259,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
             } finally {
                 setLoadingChat(false);
             }
-        } else {
+        } /*else {
             if (!lastMsg) {
                 setCurrentChatId(chatId);
                 setChatsPrepare({
@@ -242,13 +278,14 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 });
             }
             setLoadingChat(false);
-        }
-    }, [loadingChat]);
+        }*/
+    }, [loadingChat, CSRF_TOKEN, PROD_AXIOS_INSTANCE, fetchChatMessagesPath]);
     const sendSms = useCallback(async ({ to, text, files, answer, timestamp, from_id }: toSendSms) => {
+        console.log('sendSms');
         insertMessagesToArrays({to, text, answer, timestamp, from_id});
         setLoadingSendSms(true);
         try {
-            if (!PROD_AXIOS_INSTANCE || !sendSmsPath) return;
+            if (!PROD_AXIOS_INSTANCE || !sendSmsPath || !CSRF_TOKEN) return;
             const formData = new FormData();
             formData.append('_token', CSRF_TOKEN);
             formData.append(
@@ -281,12 +318,13 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
         } finally {
             setLoadingSendSms(false);
         }
-    }, [loadingSendSms]);
+    }, [loadingSendSms, CSRF_TOKEN, PROD_AXIOS_INSTANCE, sendSmsPath]);
     const markMessagesAsRead = useCallback(async (messageIds: (number | undefined)[]) => {
+        console.log('markMessagesAsRead');
         for (const id of messageIds) {
             if (PRODMODE) {
                 try {
-                    if (!PROD_AXIOS_INSTANCE || !markMessagesAsReadPath) return;
+                    if (!PROD_AXIOS_INSTANCE || !markMessagesAsReadPath || !CSRF_TOKEN) return;
                     const endpoint = `${markMessagesAsReadPath}/${id}`;
                     const response = await PROD_AXIOS_INSTANCE.post(endpoint, {
                         _token: CSRF_TOKEN,
@@ -303,7 +341,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 console.log(`/api/sms/read/${id}`)
             }
         }
-    }, []);
+    }, [CSRF_TOKEN, PROD_AXIOS_INSTANCE, markMessagesAsReadPath]);
 
     const insertMessagesToArrays = ({to, text, answer, timestamp, from_id}: toSendSms) => {
         addMessageToChat({
@@ -501,6 +539,7 @@ export const ChatSocketProvider = ({ children, url }: { children: React.ReactNod
                 SET_HTTP_HOST,
                 SET_CSRF_TOKEN,
                 SET_PRODMODE,
+                SET_BFF_PORT,
                 SET_PROD_AXIOS_INSTANCE,
 
                 setFetchChatsListPath,
