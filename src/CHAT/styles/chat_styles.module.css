@@ -198,6 +198,10 @@ ul {
     overflow: hidden;
 }
 
+.chat-layout .ant-layout-content {
+    min-height: 0 !important;
+}
+
 .chat-content {
     flex: 1;
     overflow: hidden;
