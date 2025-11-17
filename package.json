@@ -1,7 +1,7 @@
 {
   "name": "corp-chat-library-antd-react-socket",
   "description": "React chat component with Ant Design and Socket.io support",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

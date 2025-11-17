@@ -144,7 +144,7 @@ export default function ChatContent({ chatId }: { chatId: number }) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
             setIsScrolledToBottom(true);
         }
-    }, [allMessages, isScrolledToBottom]);
+    }, [allMessages]);
     useEffect(() => {
         setIsScrolledToBottom(false);
     }, [chatId]);
