@@ -23,7 +23,7 @@ export default function ChatList({ search, onSelectChat, selectedChatId }: ChatL
 
     useEffect(() => {
         fetchChatsList(search);
-    }, [search]);
+    }, [search, fetchChatsList]);
 
     const getRole = useCallback((sms: ChatToList) => {
             if (!sms || !currentUserId) return null;

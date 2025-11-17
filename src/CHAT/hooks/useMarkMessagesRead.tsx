@@ -89,7 +89,7 @@ export const useMarkMessagesRead = ({
         }, 0);
 
         return () => clearTimeout(timeout);
-    }, [messagesWithDividers, currentUserId, chatId, containerRef?.current, markMessagesAsRead]);
+    }, [messagesWithDividers, currentUserId, chatId, containerRef, markMessagesAsRead]);
 
 
     // Очищаем processedMessages при смене чата

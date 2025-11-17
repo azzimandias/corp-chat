@@ -24,7 +24,7 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
     }, [connected]);
     useEffect(() => {
         fetchChatsList(null);
-    }, [init, totalUnread]);
+    }, [init, totalUnread, fetchChatsList]);
 
     useEffect(() => {
         if (userdata && userdata?.user) {

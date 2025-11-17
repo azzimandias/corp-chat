@@ -1,8 +1,9 @@
 import './Chat.css'
 import ChatBtn from "./CHAT/ChatBtn";
-import {ChatSocketProvider, useChatSocket} from './CHAT/context/ChatSocketContext';
+import { useChatSocket} from './CHAT/context/ChatSocketContext';
 import type {ChatParams} from "./CHAT/types/types.ts";
 import {useEffect} from "react";
+import {ChatSocketProvider} from "./CHAT/provider/ChatSocketProvider";
 
 const ChatInner = ({
                        userdata,
@@ -32,11 +33,11 @@ const ChatInner = ({
     } = useChatSocket();
 
     useEffect(() => {
-        console.log('CORP-CHAT userdata', userdata);
+        /*console.log('CORP-CHAT userdata', userdata);
         console.log('CORP-CHAT httpParams', httpParams);
         console.log('CORP-CHAT fetchParams', fetchParams);
         console.log('CORP-CHAT socketSubscribe', socketSubscribe);
-        console.log('CORP-CHAT socketActions', socketActions);
+        console.log('CORP-CHAT socketActions', socketActions);*/
 
         let userdataFlag = false;
         let httpParamsFlag = false;
@@ -109,7 +110,7 @@ const Chat = (props: ChatParams) => {
     } = props;
 
     useEffect(() => {
-        console.log('CORP-CHAT MOUNTED')
+        console.log('CORP-CHAT 2 MOUNTED')
     }, []);
 
     useEffect(() => {

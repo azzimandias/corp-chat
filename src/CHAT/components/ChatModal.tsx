@@ -40,8 +40,8 @@ export const ChatModal = ({ open, onOk, onCancel, positionCorner }: ChatModalPar
             const modalWidth = dragRef.current ? dragRef.current.offsetWidth : 500; // примерная ширина модалки
             const modalHeight = dragRef.current ? dragRef.current.offsetHeight : 400; // примерная высота модалки
 
-            let x = 0;
-            let y = 0;
+            let x: number;
+            let y: number;
 
             switch (positionCorner) {
                 case 'topLeft':

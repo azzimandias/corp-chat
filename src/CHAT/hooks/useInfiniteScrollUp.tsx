@@ -100,7 +100,7 @@ export const useInfiniteScrollUp = ({
             const prevScrollHeight = container.scrollHeight;
 
             // Выполняем подгрузку
-            await fetchMoreMessages();
+            fetchMoreMessages();
             // Ждём, пока картинки загрузятся и DOM стабилизируется
             await waitImagesLoaded(container, 200);
 

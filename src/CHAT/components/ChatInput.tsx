@@ -49,7 +49,7 @@ export function ChatInput({ onSend }: { onSend: (trimmed: string, fileList: Uplo
         [inputValue, handleSend]
     );
 
-    const handleFileChange: UploadProps['onChange'] = useCallback(({ fileList: newFileList }: UploadChangeParam<UploadFile>) => {
+    const handleFileChange: UploadProps['onChange'] = useCallback(({ fileList: newFileList }: UploadChangeParam) => {
         setFileList(newFileList);
     }, []);
 
