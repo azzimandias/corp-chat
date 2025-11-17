@@ -92,7 +92,7 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
     const handleCancel = () => setIsModalOpen(false);
 
     const ButtonNode = (
-        <Button style={{ background: 'transparent' }} type="primary" onClick={showModal}>
+        <Button color="primary" variant={'solid'} onClick={showModal}>
             <MessageOutlined />
             {totalUnread > 0 && (
                 <span className={styles['notification-badge']}>{totalUnread}</span>
