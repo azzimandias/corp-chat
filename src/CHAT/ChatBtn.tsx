@@ -37,7 +37,7 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
 
     // --- Формируем smsData (чаты, где участвует текущий пользователь) ---
     const smsData = useMemo(() => {
-        console.log(chatsList);
+        /*console.log(chatsList);*/
 
         if (!Array.isArray(chatsList) || chatsList.length === 0) {
             return { hasSms: false, messages: [] };

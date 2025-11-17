@@ -53,7 +53,7 @@ export const useMarkMessagesRead = ({
                     item !== null
                 );
 
-            console.log(unreadMessages);
+            /*console.log(unreadMessages);*/
             if (unreadMessages.length === 0) return;
 
             const observer = new IntersectionObserver(

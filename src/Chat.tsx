@@ -110,7 +110,7 @@ const Chat = (props: ChatParams) => {
     } = props;
 
     useEffect(() => {
-        console.log('CORP-CHAT 2 MOUNTED')
+        console.log('CORP-CHAT MOUNTED')
     }, []);
 
     useEffect(() => {

@@ -83,10 +83,10 @@ export default function ChatContent({ chatId }: { chatId: number }) {
         return isDesc ? items.slice().reverse() : items;
     }, [allMessages]);
     const countOfUnreadMessages = useMemo(() => {
-        console.log(allMessages)
+        /*console.log(allMessages)*/
         if (!currentUserId) return [];
         return allMessages.filter((msg) => (!msg.status && +msg.fromId !== +currentUserId))?.length;
-    }, [allMessages]);
+    }, [allMessages, currentUserId]);
 
     const {
         /* info */
@@ -126,14 +126,14 @@ export default function ChatContent({ chatId }: { chatId: number }) {
     useEffect(() => {
         const foundedChat = chats.find(chat => chat.chat_id === chatId);
         if (!foundedChat && chatId&& !loadingChat && !loadingSendSms) {
-            console.log('Fetching chat messages for:', chatId);
+            /*console.log('Fetching chat messages for:', chatId);*/
             messagesWithDividers.length = 0;
             fetchChatMessages(chatId, null);
         } else if (foundedChat) {
-            console.log('Chat found:', foundedChat);
+            /*console.log('Chat found:', foundedChat);*/
             setChat(foundedChat);
         }
-    }, [chats, chatId, loadingChat, loadingSendSms]);
+    }, [chats, chatId, loadingChat, loadingSendSms, messagesWithDividers, fetchChatMessages]);
     useEffect(() => {
         if (userdata && userdata?.user) {
             setCurrentUserId(userdata?.user?.id);
@@ -144,7 +144,7 @@ export default function ChatContent({ chatId }: { chatId: number }) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
             setIsScrolledToBottom(true);
         }
-    }, [allMessages]);
+    }, [allMessages, isScrolledToBottom]);
     useEffect(() => {
         setIsScrolledToBottom(false);
     }, [chatId]);
