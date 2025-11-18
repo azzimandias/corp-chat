@@ -1,10 +1,10 @@
 import styles from './styles/chat_styles.module.css';
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button, Dropdown, Space} from 'antd';
 import {MessageOutlined} from '@ant-design/icons';
 import {ChatModal} from './components/ChatModal';
 import {useChatSocket} from "./context/ChatSocketContext";
-import type {UserData} from "./types/types.ts";
+import {ChatToList, UserData} from "./types/types";
 
 const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,7 +33,32 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
     }, [userdata]);
 
     // Используем кастомный хук для логики ролей
-    /*const { getRole, getDisplayName } = useChatRole(currentUserId);*/
+    const getRole = useCallback(
+        (sms: ChatToList) => {
+            if (!sms || !currentUserId) return null;
+
+            // Для сохраненного чата всегда возвращаем 'self'
+            if (sms.chat_id === currentUserId) {
+                return 'self';
+            }
+
+            // Основная логика определения роли
+            return sms.from?.id === currentUserId ? 'self' : 'companion';
+        },
+        [currentUserId]
+    );
+
+    // Функция получения отображаемого имени
+    const getDisplayName = useCallback((
+        sms: ChatToList,
+        role: 'self' | 'companion' | null,
+        isSaved = false
+    ) => {
+        if (isSaved) return 'Сохранённое';
+
+        const user = role === 'self' ? sms?.to : sms?.from;
+        return `${user?.surname ?? ''} ${user?.name ?? ''}`.trim();
+    }, []);
 
     // --- Формируем smsData (чаты, где участвует текущий пользователь) ---
     const smsData = useMemo(() => {
@@ -51,10 +76,8 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
             })
             .filter((chat) => chat?.count_unread > 0)
             .map((chat) => {
-                /*const role = getRole(chat);
-                const displayName = getDisplayName(chat, role, false);*/
-                const role = '';
-                const displayName = '';
+                const role = getRole(chat);
+                const displayName = getDisplayName(chat, role, false);
 
                 return {
                     id: chat.chat_id || chat.id,
@@ -69,7 +92,7 @@ const ChatBtn = ({ userdata }: { userdata: UserData | null }) => {
             });
 
         return { hasSms: messages.length > 0, messages };
-    }, [chatsList, currentUserId]); /* getRole, getDisplayName */
+    }, [chatsList, currentUserId, getRole, getDisplayName]);
     // --- Меню для dropdown ---
     const menuItems = useMemo(() => {
         if (!smsData.hasSms) return [];
