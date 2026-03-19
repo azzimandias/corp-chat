@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {io, Socket} from "socket.io-client";
 import {Chat, AlertInfo, ChatToList, UserData, ChatMessage, toSendSms, File} from "../types/types";
-import axios, {AxiosInstance} from "axios";
+import axios, {AxiosInstance, InternalAxiosRequestConfig} from "axios";
 import dayjs from "dayjs";
 import {UploadFile} from "antd";
 import { ChatSocketContext } from "../context/ChatSocketContext";
@@ -529,6 +529,12 @@ export const ChatSocketProvider = ({ children }: { children: React.ReactNode }) 
             baseURL: HTTP_HOST,
             timeout: REQUEST_TIMEOUT_MS,
             withCredentials: true,
+        });
+        instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+            if (config.data?._token) {
+                config.headers['X-CSRF-TOKEN'] = config.data._token;
+            }
+            return config;
         });
         /*console.log(instance);*/
         SET_PROD_AXIOS_INSTANCE(instance);
