@@ -50,9 +50,15 @@ const ChatInner = ({
 
         if (httpParams && httpParams?.HTTP_HOST) SET_HTTP_HOST(httpParams?.HTTP_HOST);
         if (httpParams && httpParams?.CSRF_TOKEN) SET_CSRF_TOKEN(httpParams?.CSRF_TOKEN);
-        if (httpParams && httpParams?.PRODMODE) SET_PRODMODE(httpParams?.PRODMODE);
-        if (httpParams && httpParams?.BFF_PORT) SET_BFF_PORT(httpParams?.BFF_PORT);
-        if (httpParams && httpParams?.HTTP_HOST && httpParams?.CSRF_TOKEN && httpParams?.PRODMODE && httpParams?.BFF_PORT)
+        if (httpParams && typeof httpParams?.PRODMODE === 'boolean') SET_PRODMODE(httpParams?.PRODMODE);
+        if (httpParams && typeof httpParams?.BFF_PORT === 'number') SET_BFF_PORT(httpParams?.BFF_PORT);
+        if (
+            httpParams &&
+            httpParams?.HTTP_HOST &&
+            httpParams?.CSRF_TOKEN &&
+            typeof httpParams?.PRODMODE === 'boolean' &&
+            typeof httpParams?.BFF_PORT === 'number'
+        )
             httpParamsFlag = true;
 
         if (fetchParams && fetchParams?.fetchChatsListPath) setFetchChatsListPath(fetchParams?.fetchChatsListPath);

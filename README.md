@@ -103,7 +103,7 @@ export interface User {
 
 ## HttpParams
 CSRF_TOKEN - session token for backend;\
-PRODMODE - use fetches and socked, or use mocks;\
+PRODMODE - use axios requests and socket, or use mocks;\
 HTTP_HOST - host;\
 BFF_PORT - socket port (HTTP_HOST:BFF_PORT);
 
